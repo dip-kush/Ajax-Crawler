@@ -73,4 +73,4 @@ def GetDomString(url):
 
    
 #GetDomString("https://selenium-python.readthedocs.org/navigating.html")   
-GetDomString("http://www.w3schools.com/tags/tag_button.asp")    
+#GetDomString("http://www.w3schools.com/tags/tag_button.asp")    

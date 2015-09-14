@@ -1,5 +1,5 @@
-import Clickables
-from States import State, StateNode, getAnchorTags, getButtonLinks
+from State import States, StateMachine
+from GetClickables import getAnchorTags, getButtonLinks
 
 def StartState(domString):
     
