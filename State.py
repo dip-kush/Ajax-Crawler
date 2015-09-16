@@ -7,17 +7,20 @@ class StateNode:
         self.domAddressPath = ""
         self.clickables = Clickables()
         self.title = ""
+        print self.domString
 
 class StateMachine:
     def __init__(self):
         self.graph = nx.MultiDiGraph()
-
-    def addNode(self, node1):
-        self.graph.add_node(node1)
-    
-    def addEdges(self, node1, node2):
-        self.graph.add_edge(node1, node2)
-
         
-            
+    def addNode(self, node):
+        self.graph.add_node(self, self.graph.size, domString=node.domString)
+      
+    def addEdges(self, n1, n2):
+        self.graph.add_edge(n1, n2)  
+    
+   
+class MyGraph(nx.MultiGraph):
+    def __init__(self):
+        pass
          
