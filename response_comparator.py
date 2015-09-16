@@ -33,11 +33,13 @@ def htmlcompare(document1,document2,document3):
                         print str(x.nodeName +" " +  x.nodeValue)
                         if x.nodeValue!=y.nodeValue:
                             #mark parent of x as noise=y
+                            print "noisy elements" + str(y.nodeValue)
                             b1.setAttribute('noise','y')
                         else:
                             #mark parent of x as noise=n
                             b1.setAttribute('noise','n')
                 elif x.nodeName!='#text' and y.nodeName!='#text':
+                    print str(y.nodeName) + str(y.nodeValue)
                     if x.nodeName==y.nodeName:
                         q1.put(x)
                         q2.put(y)
@@ -92,15 +94,15 @@ def htmlcompare(document1,document2,document3):
                     i=i+1
                 if flg==1:
                     break
-        if flg==1:
+        if flg==0:
             print('no vuln')
         else:
             print('vuln')
 
 import xml.dom.minidom
 from Queue import *
-benign1="<html><head><title>Title1</title></head><body><b>Hi</b></body></html>"
-benign2="<html><head><title>Title2</title></head><body><b>Hi</b></body></html>"
-hostile1="<html><head><title>Title3</title></head><body><b>Hi</b></body></html>"
+benign1="<html><head><title>Title1</title></head><body><b>Hi</b><a href='a'></a></body></html>"
+benign2="<html><head><title>Title2</title></head><body><b>Hi</b><a href='a'></a></body></html>"
+hostile1="<html><head><title>Title3</title></head><body><b>Hi</b><a href='a'></a></body></html>"
 htmlcompare(benign1,benign2,hostile1)
 
