@@ -1,10 +1,14 @@
 from urllib import urlopen
+from bs4 import BeautifulSoup
+
+
 
 class Clickables:
     def __init__(self):
-        self.anchorTags = AnchorTags()
-        self.buttonLinks = ButtonLinks()
+        self.links = []
+        self.buttons = []
 
+'''
 class AnchorTags:
     def __init__(self):
         self.Tags = []
@@ -27,50 +31,36 @@ class ButtonLinks:
     def showAll(self):
         for button in self.Buttons:
             print button
+'''
 
 
 
+def getLinks(domString):
+    validLinks = []
+    soup = BeautifulSoup(domString, 'html.parser')
+    links = soup.find_all("a")
+    buttons = soup.find_all("button")
+    for link in links:
+        link = str(link.get('href')) 
+        if len(link)==0 or link[0] == '#':
+            pass
+        else:
+             validLinks.append(link)
+    print buttons
+  
 
-def getAnchorTags(domString):
-    anchorTag = AnchorTags()
-    domStringLength = len(domString)
-    startPos = 0
-    while startPos < domStringLength:
-        anchorStartPos = domString.find("<a ", startPos)
-        if anchorStartPos == -1:
-            break
-        anchorEndPos = domString.find(">", anchorStartPos+1)
-        tagString = domString[anchorStartPos:anchorEndPos+1]
-        startPos = anchorEndPos+1
-        anchorTag.addTag(tagString)
-         
-    anchorTag.showAll()        
+ 
 
-def getButtonLinks(domString):
-    buttonLink = ButtonLinks()
-    domStringLength = len(domString)
-    startPos = 0
-    while startPos < domStringLength:
-        buttonStartPos = domString.find("<button ", startPos)
-        if buttonStartPos == -1:
-            break
-        buttonEndPos = domString.find("</button>", buttonStartPos+1)
-        buttonString = domString[buttonStartPos:buttonEndPos+9]
-        startPos = buttonEndPos+1
-        buttonLink.addButton(buttonString)
-         
-    buttonLink.showAll()        
-
-
+def getButton(domString):
+    pass
+    
 
 
 def GetDomString(url):
-    urlHandle = urlopen(url);
-    dom = urlHandle.read()
-    #print dom
-    #getAnchorTags(dom)
-    getButtonLinks(dom)
+    #urlHandle = urlopen(url);
+    #dom = urlHandle.read()
+    dom = open("page1").read()
+    getLinks(dom)
 
-   
-#GetDomString("https://selenium-python.readthedocs.org/navigating.html")   
+GetDomString("https://selenium-python.readthedocs.org/navigating.html")   
 #GetDomString("http://www.w3schools.com/tags/tag_button.asp")    
