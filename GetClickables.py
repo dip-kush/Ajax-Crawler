@@ -46,7 +46,7 @@ def getLinks(domString):
             pass
         else:
              validLinks.append(link)
-    print buttons
+    return validLinks
   
 
  
@@ -56,11 +56,11 @@ def getButton(domString):
     
 
 
-def GetDomString(url):
+def GetDomElements(url):
     #urlHandle = urlopen(url);
     #dom = urlHandle.read()
     dom = open("page1").read()
     getLinks(dom)
 
-GetDomString("https://selenium-python.readthedocs.org/navigating.html")   
+#GetDomElements("https://selenium-python.readthedocs.org/navigating.html")   
 #GetDomString("http://www.w3schools.com/tags/tag_button.asp")    

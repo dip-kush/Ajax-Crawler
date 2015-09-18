@@ -1,13 +1,14 @@
-from GetClickables import AnchorTags, ButtonLinks, Clickables
+import GetClickables
 import networkx as nx
 
 class NodeData:
     def __init__(self):
+        self.link = ""
         self.domString = ""
-        self.domAddressPath = ""
-        self.clickables = Clickables()
         self.title = ""
         self.index = -1
+        self.visited = 0
+        self.clickables = []
         print self.domString
 
 class StateMachine:
@@ -15,7 +16,8 @@ class StateMachine:
         self.graph = nx.MultiDiGraph()
         
     def addNode(self, data):
-        self.graph.add_node(self.graph.number_of_nodes, nodedata = data)
+        print self.graph.number_of_nodes()
+        self.graph.add_node(self.graph.number_of_nodes(), nodedata = data)
       
     def addEdges(self, n1, n2):
         self.graph.add_edge(n1, n2)  
@@ -33,7 +35,7 @@ class MyGraph(nx.MultiGraph):
         pass         
 
 
-
+'''
 n1=NodeData()
 n2=NodeData()
 n1.domString="abc"
@@ -43,5 +45,7 @@ n2.domAddressPath="abc";
 s=StateMachine()
 s.addNode(n1)
 s.addNode(n2)
-s.addEdges(0,1)
+print s.graph.node[0]
 
+s.addEdges(0,1)
+'''

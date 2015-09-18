@@ -1,7 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from State import States, StateNode
-from Crawler import StartState
+from Crawler import initState
+
+
 
 driver = webdriver.Firefox()
 driver.get("http://127.0.0.1:81/login/login.php")
@@ -17,9 +18,10 @@ password.send_keys("vinaykool")
 password.send_keys(Keys.RETURN)
 
 
-print driver.page_source
+#print driver.page_source
+print driver.current_url, driver.title
 
-StartState(driver.page_source)
+initState(driver.page_source, driver.current_url, driver.title, driver)
 
 #assert "Welcome, " in driver.page_source
 driver.close()
