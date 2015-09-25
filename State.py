@@ -16,7 +16,7 @@ class StateMachine:
         self.graph = nx.MultiDiGraph()
         
     def addNode(self, data):
-        print self.graph.number_of_nodes()
+        #print self.graph.number_of_nodes()
         self.graph.add_node(self.graph.number_of_nodes(), nodedata = data)
       
     def addEdges(self, n1, n2):
@@ -28,6 +28,8 @@ class StateMachine:
                 return 1
         return 0        
 
+    def numberOfNodes(self):
+        return self.graph.number_of_nodes()
 
     
 class MyGraph(nx.MultiGraph):
