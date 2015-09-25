@@ -17,9 +17,10 @@ def initState(domString, link, title, driver):
     node.title = title
     node.visited = 0
     node.clickables = getLinks(domString)
-    print "i was here"
+    #print "i was here"
     print node.clickables
-    fsm.addNode(node)
+    fsm.addNode(0, node)
+    #print fsm.graph.number_of_nodes()
     Crawl(fsm, driver)
     
 def Crawl(fsm, driver):
@@ -43,17 +44,19 @@ def Crawl(fsm, driver):
             newNode.link = driver.current_url
             newNode.domString = driver.page_source
             newNode.clickables = getLinks(newNode.domString)
-            print "the current node " + str(curNode) +  " "+ str(getLinks(domString))
+            #print "the current node " + str(curNode) +  " "+ str(getLinks(domString))
             newNode.visited = 0
             newNode.title = driver.title
-            print newNode.title
+            #print newNode.title
             existNodeNumber = fsm.checkNodeExists(newNode.domString)
-            if existNodeNumber != -1:
-                fsm.addNode(newNode)
+            if existNodeNumber == -1:
+                print "i am here"
+                #fsm.addNode(newNode)
                 nodeNumber = fsm.numberOfNodes()
-                fsm.addEdges(curNode, nodeNumber-1)
+                fsm.addNode(nodeNumber, newNode)
+                fsm.addEdges(curNode, nodeNumber)
                 print "the number of node "+ str(nodeNumber)
-                queue.put(nodeNumber-1)
+                queue.put(nodeNumber)
             else:
                 fsm.addEdges(curNode, existNodeNumber)
             #print queue

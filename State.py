@@ -16,15 +16,16 @@ class StateMachine:
     def __init__(self):
         self.graph = nx.MultiDiGraph()
         
-    def addNode(self, data):
-        #print self.graph.number_of_nodes()
-        self.graph.add_node(self.graph.number_of_nodes(), nodedata = data)
+    def addNode(self, number, data):
+        print "Number of Nodes : " + str(self.graph.number_of_nodes())
+        self.graph.add_node(number, nodedata = data)
       
     def addEdges(self, n1, n2):
         self.graph.add_edge(n1, n2)  
     
     def checkNodeExists(self, dom):
         for n in self.graph.nodes():
+            print "node number "+ str(n)
             #print self.graph.node[n]['nodedata']
             if htmlCompare(dom,None,self.graph.node[n]['nodedata'].domString):
                 return n
