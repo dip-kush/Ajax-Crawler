@@ -29,6 +29,7 @@ def Crawl(fsm, driver):
         
     while queue.empty() == False:
         curNode = queue.get()
+        driver.get(graph.node[curNode]['nodedata'].link)
         graph.node[curNode]['nodedata'].visited = 1
         clickables = []
         clickables = graph.node[curNode]['nodedata'].clickables
@@ -46,11 +47,15 @@ def Crawl(fsm, driver):
             newNode.visited = 0
             newNode.title = driver.title
             print newNode.title
-            fsm.addNode(newNode)
-            nodeNumber = fsm.numberOfNodes()
-            fsm.addEdges(curNode, nodeNumber-1)
-            print "the number of node "+ str(nodeNumber)
-            queue.put(nodeNumber-1)
+            existNodeNumber = fsm.checkNodeExists(newNode.domString)
+            if existNodeNumber != -1:
+                fsm.addNode(newNode)
+                nodeNumber = fsm.numberOfNodes()
+                fsm.addEdges(curNode, nodeNumber-1)
+                print "the number of node "+ str(nodeNumber)
+                queue.put(nodeNumber-1)
+            else:
+                fsm.addEdges(curNode, existNodeNumber)
             #print queue
             WebDriverWait(driver, 2000)
             #print driver.title

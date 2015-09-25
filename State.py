@@ -1,5 +1,6 @@
 import GetClickables
 import networkx as nx
+from DomComparator import htmlCompare
 
 class NodeData:
     def __init__(self):
@@ -9,7 +10,7 @@ class NodeData:
         self.index = -1
         self.visited = 0
         self.clickables = []
-        print self.domString
+        #print self.domString
 
 class StateMachine:
     def __init__(self):
@@ -24,9 +25,10 @@ class StateMachine:
     
     def checkNodeExists(self, dom):
         for n in self.graph.nodes():
-            if compare(dom, self.graph[n]['nodedata'].domString):
-                return 1
-        return 0        
+            #print self.graph.node[n]['nodedata']
+            if htmlCompare(dom,None,self.graph.node[n]['nodedata'].domString):
+                return n
+        return -1        
 
     def numberOfNodes(self):
         return self.graph.number_of_nodes()
