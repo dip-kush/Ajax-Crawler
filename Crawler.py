@@ -9,6 +9,9 @@ import Queue
 
 
 def initState(domString, link, title, driver):
+    '''
+    Initialize the State Machine adding a StateNode 
+    '''
     
     fsm = StateMachine()
     node = NodeData()
@@ -24,6 +27,10 @@ def initState(domString, link, title, driver):
     Crawl(fsm, driver)
     
 def Crawl(fsm, driver):
+    '''
+    Crawls the Application by doing the Breadth First Search over the State Nodes. 
+    '''
+    
     graph = fsm.graph 
     queue = Queue.Queue()
     queue.put(0)
@@ -34,24 +41,19 @@ def Crawl(fsm, driver):
         graph.node[curNode]['nodedata'].visited = 1
         clickables = []
         clickables = graph.node[curNode]['nodedata'].clickables
-        #print clickables
         domString = graph.node[curNode]['nodedata'].domString
         for clickable in clickables:
-            #print clickable
             driver.find_element_by_xpath("//a[@href='"+clickable+"']").click()
             #make a new node add in the graph and the queue            
             newNode = NodeData()
             newNode.link = driver.current_url
             newNode.domString = driver.page_source
             newNode.clickables = getLinks(newNode.domString)
-            #print "the current node " + str(curNode) +  " "+ str(getLinks(domString))
             newNode.visited = 0
             newNode.title = driver.title
-            #print newNode.title
             existNodeNumber = fsm.checkNodeExists(newNode.domString)
             if existNodeNumber == -1:
                 print "i am here"
-                #fsm.addNode(newNode)
                 nodeNumber = fsm.numberOfNodes()
                 fsm.addNode(nodeNumber, newNode)
                 fsm.addEdges(curNode, nodeNumber)
@@ -59,11 +61,8 @@ def Crawl(fsm, driver):
                 queue.put(nodeNumber)
             else:
                 fsm.addEdges(curNode, existNodeNumber)
-            #print queue
             WebDriverWait(driver, 2000)
-            #print driver.title
             driver.back()
-        #print graph.nodes()
     print graph.edges()
     pos = nx.spring_layout(graph)
     labels = {k:graph.node[k]['nodedata'].title for k in graph.nodes()}

@@ -9,6 +9,7 @@ class Clickables:
         self.buttons = []
 
 '''
+
 class AnchorTags:
     def __init__(self):
         self.Tags = []
@@ -33,6 +34,13 @@ class ButtonLinks:
 
 
 def getLinks(domString):
+    '''  
+    Returns all the anchor tags <a></a>
+    Filtering the <a> tags with href = "#something"
+    for eg <a href="#div1"> </a> 
+    because this leads to same page with no new state discovery 
+    ''' 
+
     validLinks = []
     soup = BeautifulSoup(domString, 'html.parser')
     links = soup.find_all("a")
@@ -49,11 +57,14 @@ def getLinks(domString):
  
 
 def getButton(domString):
+    ''' Get all the Buttons  <button> </button> '''
+
     pass
     
 
 
 def GetDomElements(url):
+   
     #urlHandle = urlopen(url);
     #dom = urlHandle.read()
     dom = open("page1").read()

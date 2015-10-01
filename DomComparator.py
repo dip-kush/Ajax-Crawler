@@ -3,11 +3,15 @@ from Queue import *
 
 
 def htmlCompare(document1,document2,document3):
+    '''
+    Compare the two DomString
+    document1 and document2 are DOM from Same RequestURL but with different TimeStamp 
+    document1 and document2 are compared to each after removing noise elements
+    
+    '''
     dom1=xml.dom.minidom.parseString(document1)
-    #dom2=xml.dom.minidom.parseString(document2)
     dom3=xml.dom.minidom.parseString(document3)
     root1=dom1.childNodes[0]
-    #root2=dom2.childNodes[0]
     root3=dom3.childNodes[0]
     flag=0
     if document2 is not None:
@@ -63,7 +67,7 @@ def htmlCompare(document1,document2,document3):
                 if  flag==1:
                     break
                    
-    #finding vuln
+    #finding State already Exist
     if flag==0:
         flag=0
         q1=Queue()
@@ -104,20 +108,21 @@ def htmlCompare(document1,document2,document3):
                 if flag==1:
                     break
         if flag==0:
-            print ' exist '
+            print ' State Exists with Given Dom String '
             return 1
         else:
-            print ' does not exist'
+            print 'No State Exists with Same Dom String'
             return 0    
     else:
+        print 'No State Exists with Same Dom String'
         return 0
-        print 'does not exist'
 
+'''
 file1 = open("page1", "r").read()
 file3 = open("page1", "r").read()
-
-#benign1="<html><head><title>Title1</title></head><body><b>Hi</b><a href='a'></a><p>hello1</p></body></html>"
-#benign2 = None
-#benign2="<html><head><title>Title2</title></head><body><b>Hi</b><a href='a'></a><p>hello2</p></body></html>"
-#hostile1="<html><head><title>Title3</title></head><body><b>Hi</b><a href='a'></a><p>hello3</p></body></html>"
-#htmlCompare(file1,None,file3)
+benign1="<html><head><title>Title1</title></head><body><b>Hi</b><a href='a'></a><p>hello1</p></body></html>"
+benign2 = None
+benign2="<html><head><title>Title2</title></head><body><b>Hi</b><a href='a'></a><p>hello2</p></body></html>"
+hostile1="<html><head><title>Title3</title></head><body><b>Hi</b><a href='a'></a><p>hello3</p></body></html>"
+htmlCompare(file1,None,file3)
+'''
