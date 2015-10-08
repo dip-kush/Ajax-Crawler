@@ -1,18 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from Crawler import initState
-
-
+from FormExtractor import getFormFieldValue
+import time
+    
+    
 
 def main():
     ''' 
-    crawls the website http://127.0.0.1:81/login/login.php
+    crawls the demo website http://127.0.0.1:81/login/login.php
     with login credentials 
     email = vinaysharma@gmail 
     password = vinaykool    
-
-    '''
     
+    '''
+    formValues = {}    
+    #driver = webdriver.PhantomJS()
     driver = webdriver.Firefox()
     driver.get("http://127.0.0.1:81/login/login.php")
     assert "Login Form" in driver.title
@@ -22,15 +25,20 @@ def main():
     password  = driver.find_element_by_name("Password")
     password.send_keys("vinaykool")
     password.send_keys(Keys.RETURN)
+    #time.sleep(5)
 
     #print driver.page_source
     print driver.current_url, driver.title
     
+    #Store the values of the Form to be filled
+    #formValues = getFormFieldValue("submit_form2.html")            
+    
     #move the controller to Initiate Crawler Activity
-    initState(driver.page_source, driver.current_url, driver.title, driver)
+    initState(driver.page_source, driver.current_url, driver.title, driver, formValues)
 
     #assert "Welcome, " in driver.page_source
     driver.close()
+    
 
 
 if __name__ == '__main__':

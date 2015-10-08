@@ -53,7 +53,12 @@ def getLinks(domString):
              validLinks.append(link)
     return validLinks
   
-
+def getSubmitButtons(domString):
+    '''
+    Return the target of the submit buttons
+    present in the form
+    '''
+    pass
  
 
 def getButton(domString):

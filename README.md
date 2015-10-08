@@ -1,5 +1,10 @@
-This is not the permanent project folder.
+This is a ongoing project
 
-This is created in order to share the temporary files.
+This is a tool to extract the workflow of a Web Application a kind of like crawljax
 
+We are using Selenium Python Bindings for crawling and simulation 
+Networkx for Finite State Machine or Storing the State Graph
+Beautiful Soup and lxml for parsing and Dom Tree Comparison
 
+for any queries 
+Contact dip.kush2008@gmail.com

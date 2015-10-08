@@ -6,9 +6,9 @@ from State import StateMachine, NodeData
 import matplotlib.pyplot as plt
 import networkx as nx
 import Queue
+import time
 
-
-def initState(domString, link, title, driver):
+def initState(domString, link, title, driver, formValues):
     '''
     Initialize the State Machine adding a StateNode 
     '''
@@ -16,17 +16,18 @@ def initState(domString, link, title, driver):
     fsm = StateMachine()
     node = NodeData()
     node.link = link
+    #print domString
     node.domString = domString
     node.title = title
     node.visited = 0
     node.clickables = getLinks(domString)
-    #print "i was here"
+    print "i was here"
     print node.clickables
     fsm.addNode(0, node)
     #print fsm.graph.number_of_nodes()
-    Crawl(fsm, driver)
+    Crawl(fsm, driver, formValues)
     
-def Crawl(fsm, driver):
+def Crawl(fsm, driver,formValues):
     '''
     Crawls the Application by doing the Breadth First Search over the State Nodes. 
     '''
@@ -44,6 +45,7 @@ def Crawl(fsm, driver):
         domString = graph.node[curNode]['nodedata'].domString
         for clickable in clickables:
             driver.find_element_by_xpath("//a[@href='"+clickable+"']").click()
+            #time.sleep(10)
             #make a new node add in the graph and the queue            
             newNode = NodeData()
             newNode.link = driver.current_url
@@ -63,6 +65,10 @@ def Crawl(fsm, driver):
                 fsm.addEdges(curNode, existNodeNumber)
             WebDriverWait(driver, 2000)
             driver.back()
+            
+            #try to fill the field values 
+            #press clicks of all the submit buttons
+            
     print graph.edges()
     pos = nx.spring_layout(graph)
     labels = {k:graph.node[k]['nodedata'].title for k in graph.nodes()}
