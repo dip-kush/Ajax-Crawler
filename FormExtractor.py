@@ -1,15 +1,20 @@
 from BeautifulSoup import BeautifulSoup
+from logger import LoggerHandler
 import sys
 
-formFieldsValues = {}
-formFieldsValues['id'] = {}
-formFieldsValues['xpath'] = {}
-formFieldsValues['name'] = {}
 
-print formFieldsValues
+#print formFieldsValues
+
+logger = LoggerHandler(__name__)
 
 def getFormFieldValue(file):
+    formFieldsValues = {}
+    formFieldsValues['id'] = {}
+    formFieldsValues['xpath'] = {}
+    formFieldsValues['name'] = {}
+
     try:
+        #logger.info("Reading the Form Values File %s"%file)
         file = open(file).read()
         bs = BeautifulSoup(file)
         l = bs.findAll("tr")
@@ -33,42 +38,53 @@ def getFormFieldValue(file):
                 else:
                     formFieldsValues['xpath'][fieldVal] = value
                     
-        #return formFieldsValues
+        return formFieldsValues
         #print formSubmitIds
         print formFieldsValues
     except IOError as e:
-        print "I/O Error({0}): {1} ".format(e.errno, e.strerror)
+        logger.error("I/O Error({0}): {1} ".format(e.errno, e.strerror))
     except ValueError as e:
-        print "Value Error {}".format(e)
+        logger.error("Value Error {}".format(e))
     except:
-        print sys.exc_info()
+        logger.error(sys.exc_info())
     
         
-def fillFormValues(dict, driver):
-    idFields = formFieldsValues['id']
-    nameFields = formFieldsValues['name']
-    xpathFields = formFieldsValues['xpath']
+def fillFormValues(formFieldValues, driver):
+    idFields = formFieldValues['id']
+    nameFields = formFieldValues['name']
+    xpathFields = formFieldValues['xpath']
     
     for fieldName, fieldValue in idFields.iteritems():
         try:
             element = driver.find_element_by_id(fieldName).send_keys(fieldValue)
         except:
-            sys.exc_info()
+            logger.info(sys.exc_info())
             
     for fieldName, fieldValue in nameFields.iteritems():
         try:
             element = driver.find_element_by_name(fieldName).send_keys(fieldValue)
         except:
-            sys.exc_info()
+            logger.info(sys.exc_info())
     
     for fieldName, fieldValue in xpathFields.iteritems():
         try:
             element = driver.find_element_by_xpath(fieldName).send_keys(fieldValue)
         except:
-            sys.exc_info()
+            logger.info(sys.exc_info())
             
         
-        
+def pressSubmitButtons(driver):
+    elements = driver.find_elements_by_xpath("//input[@type='submit']")
+    submitButtonNumbers = len(elements)
+    for i in range(1, submitButtonNumbers+1):
+        element = driver.find_elements_by_xpath("(//input[@type='submit'])["+i+"]")
+        element.click()           
+        driver.back()            
+
+def getSubmitButtonNumber(domString, driver):
+    elements = driver.find_elements_by_xpath("//input[@type='submit']")
+    return len(elements)
+            
 getFormFieldValue("submit_form2.html")
 
         

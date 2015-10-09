@@ -1,7 +1,8 @@
 from urllib import urlopen
 from bs4 import BeautifulSoup
+from logger import LoggerHandler
 
-
+logger = LoggerHandler(__name__)
 
 class Clickables:
     def __init__(self):

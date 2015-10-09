@@ -1,6 +1,9 @@
-import GetClickables
-import networkx as nx
 from DomComparator import htmlCompare
+from logger import LoggerHandler
+import GetClickables    
+import networkx as nx
+
+logger = LoggerHandler(__name__)
 
 class NodeData:
     ''' Initializing the Each State of StateMachine'''
@@ -27,8 +30,8 @@ class StateMachine:
         self.graph.node[number]['nodedata'] = data
          '''    
         
-        print "Number of Nodes : " + str(self.graph.number_of_nodes())
         self.graph.add_node(number, nodedata = data)
+        
       
     def addEdges(self, n1, n2):
         ''' Adding a edge from node n1 to n2 '''

@@ -1,6 +1,11 @@
 import xml.dom.minidom
 from Queue import *
+from logger import LoggerHandler
 
+
+
+
+logger = LoggerHandler(__name__)
 
 def htmlCompare(document1,document2,document3):
     '''
@@ -9,6 +14,8 @@ def htmlCompare(document1,document2,document3):
     document1 and document2 are compared to each after removing noise elements
     
     '''
+    logger = LoggerHandler(__name__)
+
     dom1=xml.dom.minidom.parseString(document1)
     dom3=xml.dom.minidom.parseString(document3)
     root1=dom1.childNodes[0]
@@ -108,13 +115,13 @@ def htmlCompare(document1,document2,document3):
                 if flag==1:
                     break
         if flag==0:
-            print ' State Exists with Given Dom String '
+            #logger.info("State Exists with Same Dom String") 
             return 1
         else:
-            print 'No State Exists with Same Dom String'
+            #logger.info("No State Exists with Same Dom String")
             return 0    
     else:
-        print 'No State Exists with Same Dom String'
+        #logger.info("No State Exists with Same Dom String")
         return 0
 
 '''

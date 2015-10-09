@@ -5,16 +5,15 @@
 include ('database_connection.php');
 
 $name = $_GET['name'];
-$fb = $_GET['fb'];
 
-$query = "insert into feedback(name, feedback) values('$name', '$fb')";
+$query = "insert into submit(name) values('$name')";
 
  $result_check_credentials = mysqli_query($dbc, $query);
         if(!$result_check_credentials){//If the QUery Failed 
             echo 'Query Failed ';
         }
 	else{
-	    echo "<title>Form1</title> <p>feedback Submitted</p>";
+	    echo "<title>form2</title>  <p>Query Submitted</p>";
            // echo "<a href='login'>login</a>";
 	}
 

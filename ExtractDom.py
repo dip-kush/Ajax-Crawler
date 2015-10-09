@@ -1,10 +1,22 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from Crawler import initState
+from logger import LoggerHandler
 from FormExtractor import getFormFieldValue
 import time
+import logging
+import logging.config
+
+
     
-    
+class Globals:
+    '''
+    Contains initialization of all the global variables
+    '''
+    def __init__(self):
+        self.formFieldValues = getFormFieldValue("submit_form2.html")
+        
+        
 
 def main():
     ''' 
@@ -12,11 +24,13 @@ def main():
     with login credentials 
     email = vinaysharma@gmail 
     password = vinaykool    
-    
     '''
-    formValues = {}    
+    logger = LoggerHandler(__name__)
+    globalVariables = Globals()
+        
     #driver = webdriver.PhantomJS()
     driver = webdriver.Firefox()
+    logger.info("FireFox is Launched")
     driver.get("http://127.0.0.1:81/login/login.php")
     assert "Login Form" in driver.title
     
@@ -34,7 +48,8 @@ def main():
     #formValues = getFormFieldValue("submit_form2.html")            
     
     #move the controller to Initiate Crawler Activity
-    initState(driver.page_source, driver.current_url, driver.title, driver, formValues)
+    logger.info("Initiating the Crawler")
+    initState(driver.page_source, driver.current_url, driver.title, driver, globalVariables)
 
     #assert "Welcome, " in driver.page_source
     driver.close()
