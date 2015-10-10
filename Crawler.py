@@ -52,7 +52,7 @@ def Crawl(fsm, driver,globalVariables):
             #make a new node add in the graph and the queue            
             newNode = createNode(driver)
             #add the Node checking if the node already exists
-            addGraphNode(newNode,curNode, driver, fsm, queue)
+            addGraphNode(newNode,curNode, driver, fsm, queue, "click:"+clickable)
             
         submitButtonNumber = getSubmitButtonNumber(domString, driver)
         time.sleep(0.5)
@@ -65,10 +65,10 @@ def Crawl(fsm, driver,globalVariables):
             element = driver.find_element_by_xpath("(//input[@type='submit'])["+str(i)+"]")
             element.click()
             newNode = createNode(driver)
-            addGraphNode(newNode, curNode, driver, fsm, queue)
+            addGraphNode(newNode, curNode, driver, fsm, queue, "form:submit"+str(i))
         
             
-    logger.info("Edges %s"%(graph.edges()))
+    printEdges(graph)
     logger.info("Number of Node Found %s"%(fsm.numberOfNodes()))
     pos = nx.spring_layout(graph)
     labels = {k:graph.node[k]['nodedata'].title for k in graph.nodes()}
@@ -80,7 +80,13 @@ def Crawl(fsm, driver,globalVariables):
     plt.show()
      
     
-    
+def printEdges(graph):
+    edges = graph.edges()
+    numEdges = len(edges)
+    for i in range(numEdges):
+        source = edges[i][0]
+        dest = edges[i][1]
+        print edges[i], graph[source][dest]
     
     
 def createNode(driver):
@@ -98,7 +104,7 @@ def createNode(driver):
     return newNode
     
     
-def addGraphNode(newNode,curNode, driver, fsm, queue):
+def addGraphNode(newNode,curNode, driver, fsm, queue,event):
     '''
     Adding a Node to the Finite State Machine
     Checking if the Dom Tree Does Not Exist Already 
@@ -110,11 +116,11 @@ def addGraphNode(newNode,curNode, driver, fsm, queue):
         nodeNumber = fsm.numberOfNodes()
         fsm.addNode(nodeNumber, newNode)
         logger.info("Adding a New Node %d to Graph"%(nodeNumber))
-        fsm.addEdges(curNode, nodeNumber)
+        fsm.addEdges(curNode, nodeNumber,event)
         logger.info("Adding a Edge from Node %d and %d"%(curNode, nodeNumber))
         queue.put(nodeNumber)
     else:
-        fsm.addEdges(curNode, existNodeNumber)
+        fsm.addEdges(curNode, existNodeNumber,event)
     WebDriverWait(driver, 2000)
     driver.back()
             

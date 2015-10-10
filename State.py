@@ -33,16 +33,15 @@ class StateMachine:
         self.graph.add_node(number, nodedata = data)
         
       
-    def addEdges(self, n1, n2):
+    def addEdges(self, n1, n2, et):
         ''' Adding a edge from node n1 to n2 '''
         
-        self.graph.add_edge(n1, n2)  
+        self.graph.add_edge(n1, n2, event=et)  
     
     def checkNodeExists(self, dom):
         ''' Checks if a State already exists by checking the DomString of all the StateNodes '''        
 
         for n in self.graph.nodes():
-            print "node number "+ str(n)
             #print self.graph.node[n]['nodedata']
             if htmlCompare(dom,None,self.graph.node[n]['nodedata'].domString):
                 ''' Comparing the Dom String of the two State Nodes '''
