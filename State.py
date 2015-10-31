@@ -1,7 +1,7 @@
+import networkx as nx
 from DomComparator import htmlCompare
 from logger import LoggerHandler
-import GetClickables
-import networkx as nx
+
 
 logger = LoggerHandler(__name__)
 
@@ -16,6 +16,7 @@ class NodeData:
         self.index = -1
         self.visited = 0
         self.clickables = []
+        self.backtrackPath = []
         # print self.domString
 
 
@@ -24,6 +25,7 @@ class StateMachine:
 
     def __init__(self):
         self.graph = nx.MultiDiGraph()
+        self.doBacktrack = False
 
     def addNode(self, number, data):
         '''

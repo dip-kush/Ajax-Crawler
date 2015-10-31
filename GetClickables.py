@@ -55,6 +55,18 @@ def getLinks(domString):
             validLinks.append(link)
     return validLinks
 
+def onClickLinks(domString):
+    '''
+    Returns the <a> with on click property
+    '''
+    onClickLinks = []
+    soup = BeautifulSoup(domString, 'html.parser')
+    links = soup.findAll("a")
+    for link in links:
+        if link.get("onclick"):
+            onClickLinks.append(link.get("onclick"))
+    return onClickLinks
+
 
 def getSubmitButtons(domString):
     '''
@@ -62,7 +74,6 @@ def getSubmitButtons(domString):
     present in the form
     '''
     pass
-
 
 def getButton(domString):
     ''' Get all the Buttons  <button> </button> '''

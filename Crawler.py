@@ -1,14 +1,12 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from GetClickables import GetDomElements, getLinks
+import Queue
+import time
+import networkx as nx
+from GetClickables import getLinks
 from selenium.webdriver.support.ui import WebDriverWait
 from State import StateMachine, NodeData
 from FormExtractor import getSubmitButtonNumber, fillFormValues
 from logger import LoggerHandler
 import matplotlib.pyplot as plt
-import networkx as nx
-import Queue
-import time
 
 
 logger = LoggerHandler(__name__)
@@ -27,6 +25,7 @@ def initState(domString, link, title, driver, formValues):
     node.title = title
     node.visited = 0
     node.clickables = getLinks(domString)
+    node.backtrackPath.append(link)
     print node.clickables
     fsm.addNode(0, node)
     Crawl(0, fsm, driver, formValues)
@@ -35,18 +34,39 @@ def initState(domString, link, title, driver, formValues):
 def drawGraph(fsm):
     graph = fsm.graph
     printEdges(graph)
+    printNodes(graph)
+    print fsm.doBacktrack
     logger.info("Number of Node Found %s" % (fsm.numberOfNodes()))
     pos = nx.spring_layout(graph)
     labels = {k: graph.node[k]['nodedata'].title for k in graph.nodes()}
     nx.draw_networkx_nodes(graph, pos)
     nx.draw_networkx_edges(graph, pos)
     nx.draw_networkx_labels(graph, pos, labels)
-    # nx.draw(graph,node_size=3000,nodelist=graph.nodes(),node_color='b')
+    #nx.draw(graph,node_size=3000,nodelist=graph.nodes(),node_color='b')
     #nx.draw_networkx_labels( graph ,pos, labels)
     plt.show()
 
     
-
+def backtrack(driver, fsm, node, formValues, tillEnd):          
+        
+    if fsm.doBacktrack == False:
+        driver.back()
+    else:
+        graph = fsm.graph
+        path = graph.node[node]['nodedata'].backtrackPath
+        driver.get(path[0])
+        for i in range(1, len(path)-1+tillEnd):
+            time.sleep(0.5)
+            fillFormValues(formValues, driver)
+            time.sleep(0.5)
+            action, target= path[i].split(":")
+            if action == "click":
+                driver.find_element_by_xpath("//a[@href='" + target + "']").click()
+            elif action == "form":
+                submitNumber = target.split('-')[1]
+                element = driver.find_element_by_xpath("(//input[@type='submit'])[" + str(submitNumber) + "]")
+                element.click()
+     
 
 def Crawl(curNode, fsm, driver, globalVariables):
     '''
@@ -54,13 +74,6 @@ def Crawl(curNode, fsm, driver, globalVariables):
     over the State Nodes.
     '''
     graph = fsm.graph
-    #queue = Queue.Queue()
-    #queue.put(0)
-
-    #while not queue.empty():
-    #curNode = queue.get()
-    #driver.get(graph.node[curNode]['nodedata'].link
-     
     graph.node[curNode]['nodedata'].visited = 1
     clickables = []
     clickables = graph.node[curNode]['nodedata'].clickables
@@ -72,7 +85,6 @@ def Crawl(curNode, fsm, driver, globalVariables):
                 globalVariables.bannedUrls,
                 graph.node[curNode]['nodedata'].link):
             continue
-
         driver.find_element_by_xpath(
             "//a[@href='" + clickable + "']").click()
         # make a new node add in the graph and the queue
@@ -80,10 +92,9 @@ def Crawl(curNode, fsm, driver, globalVariables):
         # add the Node checking if the node already exists
         nodeNumber = addGraphNode(newNode,curNode,driver,fsm,"click:"+clickable)
         if nodeNumber != -1:
-            Crawl(nodeNumber, fsm, driver, globalVariables)        
-    #WebDriverWait(driver, 2000)
-    #logger.info("Getting out from node %d to %d" % nodeNumber, curNode)
-    
+            Crawl(nodeNumber, fsm, driver, globalVariables) 
+        else:
+            backtrack(driver,fsm,curNode,globalVariables.formFieldValues, 1)
             
     submitButtonNumber = getSubmitButtonNumber(domString, driver)
     time.sleep(0.5)
@@ -91,7 +102,6 @@ def Crawl(curNode, fsm, driver, globalVariables):
     time.sleep(0.5)
     logger.info("Initiating Crawling Submit Button")
     for i in range(1, submitButtonNumber + 1):
-
         element = driver.find_element_by_xpath(
             "(//input[@type='submit'])[" + str(i) + "]")
         element.click()
@@ -100,12 +110,10 @@ def Crawl(curNode, fsm, driver, globalVariables):
         nodeNumber = addGraphNode(newNode,curNode,driver,fsm,"form:submit" +str(i))
         if nodeNumber != -1:
             Crawl(nodeNumber, fsm, driver, globalVariables)
+        else:
+            backtrack(driver,fsm,curNode,globalVariables.formFieldValues, 1)
     WebDriverWait(driver, 2000)
-    #logger.info("Getting out from node %d to %d" % nodeNumber, curNode)
-    driver.back()
-            
-    '''
-    '''
+    backtrack(driver,fsm,curNode,globalVariables.formFieldValues,0)           
     
 def bfsCrawl(fsm, driver, globalVariables):
     '''
@@ -162,7 +170,7 @@ def bfsCrawl(fsm, driver, globalVariables):
                 driver,
                 fsm,
                 queue,
-                "form:submit" +
+                "form:submit-" +
                 str(i))
 
     printEdges(graph)
@@ -172,7 +180,7 @@ def bfsCrawl(fsm, driver, globalVariables):
     nx.draw_networkx_nodes(graph, pos)
     nx.draw_networkx_edges(graph, pos)
     nx.draw_networkx_labels(graph, pos, labels)
-    # nx.draw(graph,node_size=3000,nodelist=graph.nodes(),node_color='b')
+    #nx.draw(graph,node_size=3000,nodelist=graph.nodes(),node_color='b')
     #nx.draw_networkx_labels( graph ,pos, labels)
     plt.show()
     
@@ -185,6 +193,10 @@ def checkForBannedUrls(clickable, bannedUrls, currentPath):
     else:
         return False
 
+def printNodes(graph):
+    numberofnodes = graph.number_of_nodes()
+    for i in range(numberofnodes):
+        print i ,graph.node[i]['nodedata'].backtrackPath
 
 def printEdges(graph):
     edges = graph.edges()
@@ -193,6 +205,7 @@ def printEdges(graph):
         source = edges[i][0]
         dest = edges[i][1]
         print edges[i], graph[source][dest]
+    
 
 
 def CreateNode(driver):
@@ -215,10 +228,17 @@ def addGraphNode(newNode, curNode, driver, fsm, event):
     Adding a Node to the Finite State Machine
     Checking if the Dom Tree Does Not Exist Already
     '''
-
+    graph = fsm.graph
+    curNodeUrl = graph.node[curNode]['nodedata'].link
+    newNodeUrl = driver.current_url
+    if curNodeUrl == newNodeUrl:
+        logger.debug("found the same url %s %d" % (curNodeUrl, curNode))
+        fsm.doBacktrack = True
+    for item in graph.node[curNode]['nodedata'].backtrackPath:
+        newNode.backtrackPath.append(item)
+    newNode.backtrackPath.append(event)    
     existNodeNumber = fsm.checkNodeExists(newNode.domString)
     if existNodeNumber == -1:
-
         nodeNumber = fsm.numberOfNodes()
         fsm.addNode(nodeNumber, newNode)
         logger.info("Adding a New Node %d to Graph" % (nodeNumber))

@@ -1,11 +1,9 @@
+import argparse
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from Crawler import initState
 from logger import LoggerHandler
 from FormExtractor import getFormFieldValue
-import time
-import logging
-import logging.config
 
 
 class Globals:

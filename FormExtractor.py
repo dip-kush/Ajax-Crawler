@@ -38,17 +38,13 @@ def getFormFieldValue(file):
                     formFieldsValues['name'][fieldVal] = value
                 else:
                     formFieldsValues['xpath'][fieldVal] = value
-
-        return formFieldsValues
-        # print formSubmitIds
-        print formFieldsValues
     except IOError as e:
         logger.error("I/O Error({0}): {1} ".format(e.errno, e.strerror))
     except ValueError as e:
         logger.error("Value Error {}".format(e))
     except:
         logger.error(sys.exc_info())
-
+    return formFieldsValues    
 
 def fillFormValues(formFieldValues, driver):
     idFields = formFieldValues['id']
