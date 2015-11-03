@@ -87,4 +87,4 @@ def getSubmitButtonNumber(domString, driver):
     elements = driver.find_elements_by_xpath("//input[@type='submit']")
     return len(elements)
 
-getFormFieldValue("submit_form2.html")
+#getFormFieldValue("submit_form2.html")

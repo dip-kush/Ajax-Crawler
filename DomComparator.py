@@ -1,8 +1,8 @@
 import xml.dom.minidom
 from Queue import *
 from logger import LoggerHandler
-
-
+from htmltreediff import diff
+from BeautifulSoup import BeautifulSoup
 logger = LoggerHandler(__name__)
 
 
@@ -124,56 +124,20 @@ def htmlCompare(document1, document2, document3):
         #logger.info("No State Exists with Same Dom String")
         return 0
         
+
+def hash(dom):
+    return(hashlib.sha256(dom.encode('utf-8')).hexdigest())
+
+def getDomDiff(dom1,dom2):
+    if hash(dom1) == hash(dom2):
+        return None
+    else:
+        html = diff(dom1, dom2, pretty=True)
+        bshtml = BeautifulSoup(html)
+        ins = bshtml.findAll("tr")
+        insertedHtml = ''.join(ins)
+        return insertedHtml        
         
-def DiffComparator(domString1, domString2):
-    dom1 = xml.dom.minidom.parseString(domString1)
-    dom2 = xml.dom.minidom.parseString(domString2)
-    q1 = Queue()
-    q2 = Queue()
-    if(root1.nodeName == root3.nodeName):
-        q1.put(root1)
-        q2.put(root3)
-    else:
-        flag = 1
-    while(q1.empty() == False and q2.empty() == False):
-        b1 = q1.get()
-        b2 = q2.get()
-        l1 = len(b1.childNodes)
-        l2 = len(b2.childNodes)
-        if(l1 != l2):
-            flag = 1
-            for node in b1.childNodes:
-                pass
-            break
-        else:
-            i = 0
-            while(i < l1):
-                x = b1.childNodes[i]
-                y = b2.childNodes[i]
-                if x.nodeName != '#text' and y.nodeName != '#text':
-                    if x.nodeName != y.nodeName:
-                        flag = 1
-                        break
-                    else:
-                        q1.put(x)
-                        q2.put(y)
-                elif x.nodeName == '#text' and y.nodeName == '#text':
-                    if x.nodeValue != y.nodeValue and (
-                            b1.getAttribute('noise') == 'n' or document2 is None):
-                        flag = 1
-                        break
-                else:
-                    flag = 1
-                    break
-                i = i + 1
-            if flag == 1:
-                break
-    if flag == 0:
-        #logger.info("State Exists with Same Dom String")
-        print "Same State Exist"
-    else:
-        #logger.info("No State Exists with Same Dom String")
-        print "Same State Does not Exist"
 
             
 
