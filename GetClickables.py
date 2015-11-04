@@ -43,17 +43,21 @@ def getLinks(domString):
     because this leads to same page with no new state discovery
     '''
 
-    validLinks = []
+    validLinks = {'href': [], 'onclick': []}
     soup = BeautifulSoup(domString, 'html.parser')
     links = soup.find_all("a")
     buttons = soup.find_all("button")
     for link in links:
         link = str(link.get('href'))
-        if len(link) == 0 or link[0] == '#':
+        if len(link) == 0:
             pass
         else:
-            validLinks.append(link)
+            validLinks['href'].append(link)
+    for link in links:
+        if link.get("onclick"):
+            validLinks['onclick'].append(link.get("onclick"))        
     return validLinks
+
 
 def onClickLinks(domString):
     '''

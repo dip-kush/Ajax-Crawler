@@ -6,6 +6,8 @@ from logger import LoggerHandler
 from FormExtractor import getFormFieldValue
 from BeautifulSoup import BeautifulSoup
 
+logger = LoggerHandler(__name__)
+
 
 class Globals:
     '''
@@ -13,10 +15,21 @@ class Globals:
     '''
 
     def __init__(self):
-        self.formFieldValues = {}
+        self.formFieldValues = {'id': {} , 'xpath': {}, 'name': {}}
         self.bannedUrls = []
+        self.waitTime= 0
+        
     def getFormValues(self, formFile):
         self.formFieldValues = getFormFieldValue(formFile)
+        
+     
+    def addBlackList(self, urls):
+        print urls.split(',')
+        self.bannedUrls = urls.split(',')
+                
+    def setGlobalWait(self, time):
+        self.waitTime = time    
+        
 
 def doLogin(script,login_url ,driver):
     driver.get(login_url)
@@ -63,9 +76,10 @@ def main():
     parser.add_argument("-u", "--login-url", action="store", dest="login_url", help="Login Page Url")
     parser.add_argument("-f", "--form-script", action="store", dest="form_values_script", help="Path to Form Values Script")
     parser.add_argument("-s", "--start-url", action="store", dest="start_url", help="Starting Page Url")
+    parser.add_argument("-b", "--black-list", action="store", dest="black_list_urls", help="Black List Urls")
+    parser.add_argument('-t', action="store", dest="time", type=int)
     args = parser.parse_args()
     
-    logger = LoggerHandler(__name__)
     globalVariables = Globals()
 
     # globalVariables.bannedUrls.append("http://127.0.0.1:81/login/profile.html")
@@ -77,16 +91,29 @@ def main():
     #driver.get("http://127.0.0.1:81/login/login.php")
     if args.login_url:
         login_url = args.login_url
+        
     if args.login_script:
         logger.info("Logging in Application")
         if not login_url:
             logger.error("No Login URL provided")
         else:
             doLogin(args.login_script, login_url ,driver)
+
     if args.form_values_script:
         globalVariables.getFormValues(args.form_values_script)
+
     if args.start_url:
         driver.get(args.start_url)    
+    
+    if args.black_list_urls:
+        globalVariables.addBlackList(args.black_list_urls)
+    if not args.start_url and not args.login_url:
+        logger.error("No Start Url Provided not Login Url Provided")
+        return 
+    
+    if args.time:
+        globalVariables.setGlobalWait(args.time)
+        
     # time.sleep(5)
     # print driver.page_source
     print driver.current_url, driver.title

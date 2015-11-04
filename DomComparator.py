@@ -1,3 +1,4 @@
+import hashlib
 import xml.dom.minidom
 from Queue import *
 from logger import LoggerHandler
@@ -130,13 +131,14 @@ def hash(dom):
 
 def getDomDiff(dom1,dom2):
     if hash(dom1) == hash(dom2):
-        return None
+        return True
     else:
         html = diff(dom1, dom2, pretty=True)
         bshtml = BeautifulSoup(html)
         ins = bshtml.findAll("tr")
         insertedHtml = ''.join(ins)
-        return insertedHtml        
+        return False
+        #return insertedHtml        
         
 
             
