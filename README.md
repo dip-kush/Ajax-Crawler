@@ -16,12 +16,12 @@ and import the sample_web_application/forum.sql into the database
 
 ###Usage
 
--l, "Path to python login script"
--u, "Login Page Url"
--f, "Path to Form Values Script"
--s, "Starting Page Url"
--b, "Black List Urls"
--t, "Give the time in seconds"
+- -l, "Path to python login script"
+- -u, "Login Page Url"
+- -f, "Path to Form Values Script"
+- -s, "Starting Page Url"
+- -b, "Black List Urls"
+- -t, "Give the time in seconds"
 
 ###Sample Command 
 
