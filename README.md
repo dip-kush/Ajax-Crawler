@@ -1,13 +1,36 @@
-This is a ongoing project
+#Workflow Validation Project
 
-This is a tool to extract the workflow of a Web Application a kind of like crawljax
+Clone the repository
 
-We are using Selenium Python Bindings for crawling and simulation 
-Networkx for Finite State Machine or Storing the State Graph
-Beautiful Soup and lxml for parsing and Dom Tree Comparison
- 
-The sample Web Application which I am using for testing now is there with the project. The backend of sample Web Application is in PHP.
-The sql file for the database of the Sample Web Application is also there with the project. 
+	https://github.com/dip-kush/workflow_validation_temp/
 
-for any queries 
-Contact dip.kush2008@gmail.com
+Use the requirement file to install the dependency file
+
+	pip install -r requirements.txt
+
+### Instruction for using the sample_web_application
+
+Copy the sample_web_application and paste in the xampp server 
+
+and import the sample_web_application/forum.sql into the database
+
+###Usage
+
+-l, "Path to python login script"
+-u, "Login Page Url"
+-f, "Path to Form Values Script"
+-s, "Starting Page Url"
+-b, "Black List Urls"
+-t, "Give the time in seconds"
+
+###Sample Command 
+
+python ExtractDom.py -l login_script.html -u path_to_sample_application/login.php -f form_values.html
+
+Edit the sample script to run
+
+./run.sh
+./script.sh
+
+
+

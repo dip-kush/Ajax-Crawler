@@ -42,9 +42,13 @@
 <form method="get" action="feedback.php">
 
 <input type="text" id="name" name="name" placeholder="name" /><br/>
-<textarea cols="20" rows="4" id="fb" name="fb" placeholder="feedback"> </textarea> <br/>
+<textarea cols="20" rows="4" name="fb" placeholder="feedback"> </textarea> <br/>
 <input type="submit" value="feedback" />	
 </form>
+
+
+</form>
+
 </fieldset>
 </body>
 </html>

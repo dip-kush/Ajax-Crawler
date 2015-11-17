@@ -20,10 +20,10 @@ DEFINE('WEBSITE_URL', 'http://localhost');
 
 
 // Make the connection:
-$dbc = @mysqli_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD,
-    DATABASE_NAME);
+$dbc = @mysqli_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD,DATABASE_NAME);
 
 if (!$dbc) {
+    echo "hello world";
     trigger_error('Could not connect to MySQL: ' . mysqli_connect_error());
 }
 

@@ -39,8 +39,8 @@ def drawGraph(fsm):
     print fsm.doBacktrack
     logger.info("Number of Node Found %s" % (fsm.numberOfNodes()))
     pos = nx.spring_layout(graph)
-    labels = {k: str(k) for k in graph.nodes()}
-    #labels = {k: graph.node[k]['nodedata'].title for k in graph.nodes()}
+    #labels = {k: str(k) for k in graph.nodes()}
+    labels = {k: graph.node[k]['nodedata'].title for k in graph.nodes()}
     nx.draw_networkx_nodes(graph, pos)
     nx.draw_networkx_edges(graph, pos)
     nx.draw_networkx_labels(graph, pos, labels)
@@ -119,7 +119,9 @@ def Crawl(curNode, fsm, driver, globalVariables):
             backtrack(driver,fsm,curNode,globalVariables.formFieldValues, 1)
     WebDriverWait(driver, 2000)
     backtrack(driver,fsm,curNode,globalVariables.formFieldValues,0)           
-    
+ 
+
+   
 def bfsCrawl(fsm, driver, globalVariables):
     '''
     Crawls the Application by doing the Breadth First Search

@@ -1,5 +1,5 @@
 import networkx as nx
-from DomComparator import htmlCompare
+from DomComparator import htmlCompare,getDomDiff
 from logger import LoggerHandler
 
 
@@ -15,9 +15,10 @@ class NodeData:
         self.title = ""
         self.index = -1
         self.visited = 0
-        self.clickables = []
+        self.clickables = {'href': [], 'onclick': []}
+        
         self.backtrackPath = []
-        # print self.domString
+        # print self.domStrings
 
 
 class StateMachine:
@@ -48,8 +49,9 @@ class StateMachine:
 
         for n in self.graph.nodes():
             # print self.graph.node[n]['nodedata']
-            if htmlCompare(dom, None, self.graph.node[
-                           n]['nodedata'].domString):
+            if getDomDiff(dom,self.graph.node[n]['nodedata'].domString):
+            #if htmlCompare(dom, None, self.graph.node[
+            #               n]['nodedata'].domString):
                 ''' Comparing the Dom String of the two State Nodes '''
                 return n
         return -1
