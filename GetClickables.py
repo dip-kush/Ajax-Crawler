@@ -11,29 +11,6 @@ class Clickables:
         self.links = []
         self.buttons = []
 
-'''
-
-class AnchorTags:
-    def __init__(self):
-        self.Tags = []
-
-    def addTag(self, link):
-        self.Tags.append(link)
-    def showAll(self):
-        for tag in self.Tags:
-            print tag
-
-class ButtonLinks:
-    def __init__(self):
-        self.Buttons = []
-
-    def addButton(self, button):
-        self.Buttons.append(button)
-    def showAll(self):
-        for button in self.Buttons:
-            print button
-'''
-
 
 def getLinks(domString):
     '''

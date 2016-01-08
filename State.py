@@ -1,5 +1,6 @@
 import networkx as nx
-from DomComparator import htmlCompare,getDomDiff
+from DomComparator import checkExistState
+from UrlComparator import compare_url
 from logger import LoggerHandler
 
 
@@ -16,7 +17,7 @@ class NodeData:
         self.index = -1
         self.visited = 0
         self.clickables = {'href': [], 'onclick': []}
-        
+        self.insertedDom = ""
         self.backtrackPath = []
         # print self.domStrings
 
@@ -49,7 +50,7 @@ class StateMachine:
 
         for n in self.graph.nodes():
             # print self.graph.node[n]['nodedata']
-            if getDomDiff(dom,self.graph.node[n]['nodedata'].domString):
+            if checkExistState(dom,self.graph.node[n]['nodedata'].domString):
             #if htmlCompare(dom, None, self.graph.node[
             #               n]['nodedata'].domString):
                 ''' Comparing the Dom String of the two State Nodes '''
@@ -60,7 +61,16 @@ class StateMachine:
         ''' Returns the number of Nodes in a graph '''
 
         return self.graph.number_of_nodes()
-
+    
+    def checkStateUrlExist(self, url):
+        '''
+        Check if the url with similar
+        parameters has benn crawled or not
+        '''
+        for n in self.graph.nodes():
+            if compare_url(url, self.graph.node[n]['nodedata'].link):
+                return True
+        return False       
 
 class MyGraph(nx.MultiGraph):
     ''' Temporary Graph Class'''

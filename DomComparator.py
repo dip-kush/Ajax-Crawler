@@ -2,146 +2,32 @@ import hashlib
 import xml.dom.minidom
 from Queue import *
 from logger import LoggerHandler
-from htmltreediff import diff
+from lxml.html.diff import htmldiff
 from BeautifulSoup import BeautifulSoup
 logger = LoggerHandler(__name__)
+   
 
-
-def htmlCompare(document1, document2, document3):
-    '''
-    Compare the two DomString
-    document1 and document2 are DOM from Same RequestURL but with different TimeStamp
-    document1 and document2 are compared to each after removing noise elements
-
-    '''
-    logger = LoggerHandler(__name__)
-
-    dom1 = xml.dom.minidom.parseString(document1)
-    dom3 = xml.dom.minidom.parseString(document3)
-    root1 = dom1.childNodes[0]
-    root3 = dom3.childNodes[0]
-    flag = 0
-    if document2 is not None:
-        dom2 = xml.dom.minidom.parseString(document2)
-        root2 = dom2.childNodes[0]
-        print root1
-        # finding noise
-        q1 = Queue()
-        q2 = Queue()
-        if(root1.nodeName == root2.nodeName):
-            q1.put(root1)
-            q2.put(root2)
-        else:
-            print('Err:Benign inputs should have same structure')
-        while(q1.empty() == False and q2.empty() == False):
-            b1 = q1.get()
-            b2 = q2.get()
-            l1 = len(b1.childNodes)
-            l2 = len(b2.childNodes)
-            if(l1 != l2):
-                print('Err:Benign inputs should have same structure')
-                break
-            else:
-                i = 0
-                flag = 0
-                while(i < l1):
-                    x = b1.childNodes[i]
-
-                    y = b2.childNodes[i]
-                    if x.nodeName == '#text' and y.nodeName == '#text':
-                        print str(x.nodeName + " " + x.nodeValue)
-                        if x.nodeValue != y.nodeValue:
-                            # mark parent of x as noise=y
-                            print "noisy elements" + str(y.nodeValue)
-                            b1.setAttribute('noise', 'y')
-                        else:
-                            # mark parent of x as noise=n
-                            b1.setAttribute('noise', 'n')
-                    elif x.nodeName != '#text' and y.nodeName != '#text':
-                        print str(y.nodeName) + str(y.nodeValue)
-                        if x.nodeName == y.nodeName:
-                            q1.put(x)
-                            q2.put(y)
-                        else:
-                            print('Err:Benign inputs should have same structure')
-                            flag = 1
-                            break
-                    else:
-                        print('Err: Benign inputs should have same structure')
-                        flag = 1
-                        break
-                if flag == 1:
-                    break
-
-                    i = i + 1
-    # finding State already Exist
-    if flag == 0:
-        flag = 0
-        q1 = Queue()
-        q2 = Queue()
-        if(root1.nodeName == root3.nodeName):
-            q1.put(root1)
-            q2.put(root3)
-        else:
-            flag = 1
-        while(q1.empty() == False and q2.empty() == False):
-            b1 = q1.get()
-            b2 = q2.get()
-            l1 = len(b1.childNodes)
-            l2 = len(b2.childNodes)
-            if(l1 != l2):
-                flag = 1
-                break
-            else:
-                i = 0
-                while(i < l1):
-                    x = b1.childNodes[i]
-                    y = b2.childNodes[i]
-                    if x.nodeName != '#text' and y.nodeName != '#text':
-                        if x.nodeName != y.nodeName:
-                            flag = 1
-                            break
-                        else:
-                            q1.put(x)
-                            q2.put(y)
-                    elif x.nodeName == '#text' and y.nodeName == '#text':
-                        if x.nodeValue != y.nodeValue and (
-                                b1.getAttribute('noise') == 'n' or document2 is None):
-                            flag = 1
-                            break
-                    else:
-                        flag = 1
-                        break
-                    i = i + 1
-                if flag == 1:
-                    break
-        if flag == 0:
-            #logger.info("State Exists with Same Dom String")
-            return 1
-        else:
-            #logger.info("No State Exists with Same Dom String")
-            return 0
-    else:
-        #logger.info("No State Exists with Same Dom String")
-        return 0
-        
-
+def cleanDom(dom):
+    repl = ["</ins>,", "<ins>,","<ins>", "</ins>"]
+    for key in repl:
+        dom = dom.replace(key, "")
+    return dom
+     
 def hash(dom):
     return(hashlib.sha256(dom.encode('utf-8')).hexdigest())
 
-def getDomDiff(dom1,dom2):
+def checkExistState(dom1,dom2):
     if hash(dom1) == hash(dom2):
         return True
     else:
-        html = diff(dom1, dom2, pretty=True)
-        bshtml = BeautifulSoup(html)
-        ins = bshtml.findAll("tr")
-        insertedHtml = ''.join(ins)
         return False
-        #return insertedHtml        
         
-
-            
+def getDomDiff(parentDom, childDom):
+    html = htmldiff(parentDom, childDom)
+    bshtml = BeautifulSoup(html)
+    ins = ''.join(str(bshtml.findAll("ins")))  
+    diffDom = cleanDom(ins)
+    return diffDom      
 
 '''
 file1 = open("page1", "r").read()

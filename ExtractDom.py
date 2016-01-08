@@ -17,7 +17,9 @@ class Globals:
     def __init__(self):
         self.formFieldValues = {'id': {} , 'xpath': {}, 'name': {}}
         self.bannedUrls = []
+        self.scopeUrls = []
         self.waitTime= 0
+        self.baseAddress = ""        
         
     def getFormValues(self, formFile):
         self.formFieldValues = getFormFieldValue(formFile)
@@ -30,6 +32,11 @@ class Globals:
     def setGlobalWait(self, time):
         self.waitTime = time    
         
+    def addScopeUrl(self, urls):
+        self.scopeUrls = urls.split(",")
+        
+    def addBaseAddress(self, baseAddress):
+        self.baseAddress = baseAddress
 
 def doLogin(script,login_url ,driver):
     driver.get(login_url)
@@ -75,8 +82,10 @@ def main():
     parser.add_argument("-l", "--login-script", action="store", dest="login_script", help="Path to python login script")
     parser.add_argument("-u", "--login-url", action="store", dest="login_url", help="Login Page Url")
     parser.add_argument("-f", "--form-script", action="store", dest="form_values_script", help="Path to Form Values Script")
+    parser.add_argument("-b", "--base-address", action="store", dest="base_address", help="Base address")
     parser.add_argument("-s", "--start-url", action="store", dest="start_url", help="Starting Page Url")
-    parser.add_argument("-b", "--black-list", action="store", dest="black_list_urls", help="Black List Urls")
+    parser.add_argument("-bl", "--black-list", action="store", dest="black_list_urls", help="Black List Urls")
+    parser.add_argument("-sc", "--scope", action="store", dest="scope_url", help="scope of the crawler")
     parser.add_argument('-t', action="store", dest="time", type=int)
     args = parser.parse_args()
     
@@ -101,12 +110,20 @@ def main():
 
     if args.form_values_script:
         globalVariables.getFormValues(args.form_values_script)
+   
+    if args.base_address:
+        globalVariables.addBaseAddress(args.base_address)
+        
 
     if args.start_url:
         driver.get(args.start_url)    
     
+    if args.scope_url:
+        globalVariables.addScopeUrl(args.scope_url)
+    
     if args.black_list_urls:
         globalVariables.addBlackList(args.black_list_urls)
+
     if not args.start_url and not args.login_url:
         logger.error("No Start Url Provided not Login Url Provided")
         return 
