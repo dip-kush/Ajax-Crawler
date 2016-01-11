@@ -30,6 +30,9 @@ logging.config.dictConfig({
 
 
 def LoggerHandler(name):
+    '''
+    Prints the logs of Crawling 
+    '''
     logger = logging.getLogger(name)
     handler = logging.FileHandler('crawling.log')
     #handler = logging.StreamHandler()

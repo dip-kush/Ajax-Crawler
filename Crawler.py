@@ -14,11 +14,11 @@ import matplotlib.pyplot as plt
 logger = LoggerHandler(__name__)
 
 
+
 def initState(domString, link, title, driver, formValues):
     '''
     Initialize the State Machine adding a StateNode
     '''
-
     fsm = StateMachine()
     node = NodeData()
     node.link = link
@@ -30,10 +30,10 @@ def initState(domString, link, title, driver, formValues):
     node.backtrackPath.append(link)
     print 0, node.clickables
     fsm.addNode(0, node)
-    Crawl(0, fsm, driver, formValues)    
+    Crawl(0, fsm, driver, formValues)
     #clickables = graph.node[curNode]['nodedata'].clickables
     drawGraph(fsm)
-    
+
 def drawGraph(fsm):
     graph = fsm.graph
     printEdges(graph)
@@ -50,8 +50,7 @@ def drawGraph(fsm):
     #nx.draw_networkx_labels( graph ,pos, labels)
     plt.show()
 
-    
-def backtrack(driver, fsm, node, formValues, tillEnd):               
+def backtrack(driver, fsm, node, formValues, tillEnd):
     if fsm.doBacktrack == False:
         driver.back()
     else:
@@ -69,7 +68,7 @@ def backtrack(driver, fsm, node, formValues, tillEnd):
                 submitNumber = target.split('-')[1]
                 element = driver.find_element_by_xpath("(//input[@type='submit'])[" + str(submitNumber) + "]")
                 element.click()
-    time.sleep(2.0) 
+    time.sleep(2.0)
 
 def Crawl(curNode, fsm, driver, globalVariables):
     '''
@@ -83,13 +82,13 @@ def Crawl(curNode, fsm, driver, globalVariables):
     domString = graph.node[curNode]['nodedata'].domString
     logger.info("Clicking All Clickables to get a New State")
     for clickableType, clickableList in clickables.iteritems():
-        for clickable in clickableList:        
+        for clickable in clickableList:
             if checkForBannedUrls(
                     clickable,
                     globalVariables,
                     graph.node[curNode]['nodedata'].link):
                 continue
-                        
+
             if fsm.checkStateUrlExist(globalVariables.baseAddress+clickable):
                 continue
             logger.info("Trying to click"+clickable)
@@ -101,10 +100,10 @@ def Crawl(curNode, fsm, driver, globalVariables):
             # add the Node checking if the node already exists
             nodeNumber = addGraphNode(newNode,curNode,driver,fsm,"click:"+clickable)
             if nodeNumber != -1:
-                Crawl(nodeNumber, fsm, driver, globalVariables) 
+                Crawl(nodeNumber, fsm, driver, globalVariables)
             else:
                 backtrack(driver,fsm,curNode,globalVariables.formFieldValues, 1)
-                
+
     submitButtonNumber = getSubmitButtonNumber(domString, driver)
     time.sleep(2.0)
     fillFormValues(globalVariables.formFieldValues, driver)
@@ -116,32 +115,32 @@ def Crawl(curNode, fsm, driver, globalVariables):
         element.click()
         time.sleep(2)
         newNode = CreateNode(driver)
-        
+
         nodeNumber = addGraphNode(newNode,curNode,driver,fsm,"form:submit" +str(i))
         if nodeNumber != -1:
             Crawl(nodeNumber, fsm, driver, globalVariables)
         else:
             backtrack(driver,fsm,curNode,globalVariables.formFieldValues, 1)
     WebDriverWait(driver, 2000)
-    backtrack(driver,fsm,curNode,globalVariables.formFieldValues,0)           
- 
+    backtrack(driver,fsm,curNode,globalVariables.formFieldValues,0)
 
-   
-    
+
+
+
 
 def checkForBannedUrls(clickable, globalVariables, currentPath):
-    '''    
+    '''
     if clickable.find("http") != -1:
         logger.info(clickable + "is a absolute link")
         path = clickable
-    else:        
+    else:
         index = currentPath.rfind("/")
         path = currentPath[0:index] + "/" + clickable
-    '''     
+    '''
     scopeUrls = globalVariables.scopeUrls
     baseAddress = globalVariables.baseAddress
     bannedUrls= globalVariables.bannedUrls
-    flag = 0    
+    flag = 0
     parsed = urlparse(clickable)
     if not parsed.hostname:
         combinedUrl = baseAddress+parsed.path
@@ -151,10 +150,10 @@ def checkForBannedUrls(clickable, globalVariables, currentPath):
         if item in combinedUrl:
             flag = 1
             break
-        
+
     if flag == 0:
         return True
-    
+
     if clickable in bannedUrls:
         logger.info("Exist in Banned Url " + clickable)
         return True
@@ -176,7 +175,7 @@ def printEdges(graph):
         source = edges[i][0]
         dest = edges[i][1]
         print edges[i], graph[source][dest]
-    
+
 
 
 def CreateNode(driver):
@@ -203,13 +202,13 @@ def addGraphNode(newNode, curNode, driver, fsm, event):
     if curNodeUrl == newNodeUrl:
         logger.debug("found the same url %s %d" % (curNodeUrl, curNode))
         fsm.doBacktrack = True
-        
+
     for item in graph.node[curNode]['nodedata'].backtrackPath:
         newNode.backtrackPath.append(item)
-        
-    newNode.backtrackPath.append(event)    
+
+    newNode.backtrackPath.append(event)
     existNodeNumber = fsm.checkNodeExists(newNode.domString)
-    
+
     if existNodeNumber == -1:
         nodeNumber = fsm.numberOfNodes()
         newNode.insertedDom = getDomDiff(graph.node[curNode]['nodedata'].domString,newNode.domString)
@@ -222,7 +221,7 @@ def addGraphNode(newNode, curNode, driver, fsm, event):
             "Adding a Edge from Node %d and %d" %
             (curNode, nodeNumber))
         print nodeNumber, newNode.clickables
-        return nodeNumber    
+        return nodeNumber
         #queue.put(nodeNumber)
     else:
         logger.info("Dom Tree Already Exist")
