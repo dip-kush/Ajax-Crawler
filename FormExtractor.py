@@ -8,7 +8,7 @@ import sys
 logger = LoggerHandler(__name__)
 
 
-def getFormFieldValue(file):
+def getFormFieldValue(filePath, fileHandler=None):
     formFieldsValues = {}
     formFieldsValues['id'] = {}
     formFieldsValues['xpath'] = {}
@@ -16,7 +16,10 @@ def getFormFieldValue(file):
 
     try:
         #logger.info("Reading the Form Values File %s"%file)
-        file = open(file).read()
+        if fileHandler:
+            file = fileHandler
+        else:
+            file = open(filePath).read()
         bs = BeautifulSoup(file)
         l = bs.findAll("tr")
         for i in range(1, len(l)):

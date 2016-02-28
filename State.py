@@ -16,9 +16,9 @@ class NodeData:
         self.title = ""
         self.index = -1
         self.visited = 0
-        self.clickables = {'href': [], 'onclick': []}
-        self.insertedDom = ""
+        self.clickables = []
         self.backtrackPath = []
+        self.insertedDom = ""
         # print self.domStrings
 
 
@@ -31,10 +31,9 @@ class StateMachine:
 
     def addNode(self, number, data):
         '''
-        Adding the State in the FSM assigning the nodenumber and 
+        Adding the State in the FSM assigning the nodenumber and
         data to the node self.graph.node[number]['nodedata'] = data
          '''
-
         self.graph.add_node(number, nodedata=data)
 
     def addEdges(self, n1, n2, et):
@@ -43,9 +42,9 @@ class StateMachine:
         self.graph.add_edge(n1, n2, event=et)
 
     def checkNodeExists(self, dom):
-        ''' 
-        Checks if a State already exists by 
-        checking the DomString of all the StateNodes 
+        '''
+        Checks if a State already exists by
+        checking the DomString of all the StateNodes
         '''
 
         for n in self.graph.nodes():
@@ -61,7 +60,7 @@ class StateMachine:
         ''' Returns the number of Nodes in a graph '''
 
         return self.graph.number_of_nodes()
-    
+
     def checkStateUrlExist(self, url):
         '''
         Check if the url with similar
@@ -70,14 +69,7 @@ class StateMachine:
         for n in self.graph.nodes():
             if compare_url(url, self.graph.node[n]['nodedata'].link):
                 return True
-        return False       
-
-class MyGraph(nx.MultiGraph):
-    ''' Temporary Graph Class'''
-
-    def __init__(self):
-        pass
-
+        return False
 
 '''
 

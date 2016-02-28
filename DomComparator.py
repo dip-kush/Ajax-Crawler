@@ -10,15 +10,14 @@ from lxml.html.clean import clean_html
 import os, sys
 from StringIO import StringIO
 logger = LoggerHandler(__name__)
-   
-out = StringIO()
+
 
 def cleanDom(dom):
     repl = ["</ins>,", "<ins>,","<ins>", "</ins>"]
     for key in repl:
         dom = dom.replace(key, "")
     return dom
-     
+
 def hash(dom):
     return(hashlib.sha256(dom.encode('utf-8')).hexdigest())
 
@@ -28,35 +27,77 @@ def checkExistState(dom1,dom2):
     else:
         tagCount1, strippedDom1 = traverseDom(dom1)
         tagCount2, strippedDom2 = traverseDom(dom2)
-        diff = htmldiff(strippedDom1, strippedDom2)
+        #print "ALL tag count %d %d" % (tagCount1, tagCount2)
+        mintagCount = min(tagCount1,tagCount2)
+        maxtagCount = max(tagCount1,tagCount2)
+        print mintagCount, maxtagCount
+        if float(mintagCount)/float(maxtagCount) < 0.9:
+            print "huge difference in tag count"
+            return False
+        #print strippedDom1
+        #print strippedDom2
+        diff1 = htmldiff(strippedDom1, strippedDom2)
+        diff2 = htmldiff(strippedDom2,strippedDom1)
+        if len(diff1) > len(diff2):
+            diff = diff1
+        else:
+            diff = diff2
+
         bdiff = BeautifulSoup(diff)
         ins = ''.join(str(bdiff.findAll("ins")))
+        delete = ''.join(str(bdiff.findAll("del")))
+        #print ins
+        print cleanDom(delete)
         diffDom = cleanDom(ins)
-        diffTagCount,diffStrippedDom = traverseDom(diffDom)                
-        if (float(diffTagCount)/float(tagCount1))*100 > 10:
+        print diffDom
+
+        if diffDom!="[]":
+            diffTagCount,diffStrippedDom = traverseDom(diffDom)
+        else:
+            print "i am here"
+            if hash(strippedDom1) ==  hash(strippedDom2):
+                return True
+            else:
+                return False
+            #diffTagCount = 0
+            #diffStrippedDom = ""
+        #print diffStrippedDom
+        #print diffTagCount
+        print "tag count %d %d" % (diffTagCount, tagCount1)
+        print "first dom"
+        print dom1
+        print "second dom"
+        print dom2
+        if (float(diffTagCount)/float(tagCount1))*100 > 5:
             return False
+        logger.info("state already exist")
+        #print dom1
+        #print dom2
         return True
-        
+
 def getDomDiff(parentDom, childDom):
     html = htmldiff(parentDom, childDom)
     bshtml = BeautifulSoup(html)
-    ins = ''.join(str(bshtml.findAll("ins")))  
+    ins = ''.join(str(bshtml.findAll("ins")))
     diffDom = cleanDom(ins)
-    return diffDom      
-    
-    
-def traverseDom(document):
-    document = str(tidy.parseString(document))
-    document = clean_html(document)
+    return diffDom
+
+def traverseDom(domString):
+    out = StringIO()
+    #print domString
+    domString = str(tidy.parseString(domString))
+    #print domString
+    domString = clean_html(domString)
+    #print domString
     #print data
-    tree   = etree.HTML(document.replace('\r', ''))
-    document = '\n'.join([ etree.tostring(stree, pretty_print=True, method="xml") 
+    tree   = etree.HTML(domString.replace('\r', ''))
+    domString = '\n'.join([ etree.tostring(stree, pretty_print=True, method="xml")
                           for stree in tree ])
     tagCount = 0
-    dom = xml.dom.minidom.parseString(document)
-    q = Queue() 
+    dom = xml.dom.minidom.parseString(domString)
+    q = Queue()
     nodes = dom.childNodes
-    
+
     for node in nodes:
         q.put(node)
     while(q.empty() == False):
@@ -65,7 +106,6 @@ def traverseDom(document):
         if cur.nodeName == '#text':
             cur.nodeValue = ""
             tagCount-=1
-
         if cur.attributes:
             keys = cur.attributes.keys()
             for key in keys:
@@ -73,8 +113,8 @@ def traverseDom(document):
         l = len(cur.childNodes)
         i = 0
         while i < l:
-            q.put(cur.childNodes[i]) 
-            i+=1 
+            q.put(cur.childNodes[i])
+            i+=1
     dom.writexml(out)
     s = out.getvalue()
     return (tagCount, s)

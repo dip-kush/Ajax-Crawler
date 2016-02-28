@@ -1,0 +1,2 @@
+python ExtractDom.py -s http://127.0.0.1:81/wivet/ -b http://127.0.0.1:81/wivet/ -sc 127.0.0.1:81/wivet/ -bl 1.php,2.php,4.php,5.php,6.php,8.php,9.php,12.php,14.php,15.php,16.php,17.php,18.php,19.php,21.php,http://127.0.0.1:81/wivet/offscanpages/statistics.php,http://127.0.0.1:81/wivet/offscanpages/current.php,http://127.0.0.1:81/wivet/offscanpages/about.php,http://127.0.0.1:81/wivet/logout.php
+#-bl http://tutorialzine.com/,http://tutorialzine.com/2009/09/simple-ajax-website-jquery/
