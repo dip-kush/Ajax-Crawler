@@ -111,6 +111,9 @@ def initializeParams(crawling_spec):
     if crawling_spec["black_list_urls"]:
         globalVariables.addBlackList(crawling_spec["black_list_urls"])
 
+    if crawling_spec["depth"]:
+            globalVariables.setDepth(int(crawling_spec["depth"]))
+
     if not crawling_spec["start_url"] and not crawling_spec["login_url"]:
         logger.error("No Start Url Provided not Login Url Provided")
         return
@@ -126,7 +129,7 @@ def initializeParams(crawling_spec):
         driver.current_url,
         driver.title,
         driver,
-        globalVariables)
+        globalVariables,0)
 
     #assert "Welcome, " in driver.page_source
     driver.close()

@@ -81,10 +81,6 @@ def backtrack(driver, fsm, node, formValues, tillEnd):
         print path[i].tag, path[i].attr, path[i].attrVal
     '''
     for i in range(1, len(path)-1+tillEnd):
-        #tag = path[i].tag
-        #attr = path[i].attr
-        #attrVal = path[i].attrVal
-        #tagNumber = path[i].tagNumber
         '''
         if i==1:
             driver.switch_to.parent_frame()
@@ -93,7 +89,6 @@ def backtrack(driver, fsm, node, formValues, tillEnd):
         time.sleep(0.5)
         fillFormValues(formValues, driver)
         time.sleep(0.5)
-
         #action, target= path[i].split(":")
         '''
         if tag == "a":
@@ -144,13 +139,11 @@ def crawlFrame(curNode, fsm, driver, globalVariables):
             "//"+tag+"[@"+attr+"='" + attrVal + "']").click()
 
         AcceptAlert(driver)
-        #print driver.page_source
         time.sleep(2)
 
         driver.switch_to.parent_frame()
         driver.switch_to.frame(driver.find_element_by_name(bodyFrame))
 
-        #print driver.page_source
         # code for crawling the body
         newNode = CreateNode(driver)
         # add the Node checking if the node already exists
@@ -193,34 +186,17 @@ def Crawl(curNode, fsm, driver, globalVariables, depth):
     domString = graph.node[curNode]['nodedata'].domString
     logger.info("Clicking All Clickables to get a New State")
     for entity in clickables:
-        #tag = entity.tag
-        #attr = entity.attr
-        #attrVal = entity.attrVal
-        '''
-        if checkForBannedUrls(
-                entity.attrs,
-                globalVariables,
-                graph.node[curNode]['nodedata'].link):
-            continue
-        '''
-        '''
-        if checkForBannedUrls(
-                attrVal,
-                globalVariables,
-                graph.node[curNode]['nodedata'].link):
-            continue
-        '''
-        #print entity.attrs, type(entity.attrs)
+
         if entity.tag == "a" and entity.attrs.has_key('href'):
-            #print entity
+
             if checkForBannedUrls(
                     entity.attrs,
                     globalVariables,
                     graph.node[curNode]['nodedata'].link):
                 continue
+
             if fsm.checkStateUrlExist(globalVariables.baseAddress+entity.attrs['href']):
                 continue
-        #print entity.xpath
 
         logger.info("Trying to click the element"+entity.xpath)
         time.sleep(1.5)
@@ -230,11 +206,9 @@ def Crawl(curNode, fsm, driver, globalVariables, depth):
             driver.find_element_by_xpath(entity.xpath).click()
         except Exception as e:
             print e
-        #    "//"+tag+"[@"+attr+"='" + attrVal + "']").click()
 
         AcceptAlert(driver)
 
-        #print driver.page_source
         time.sleep(1)
         # make a new node add in the graph and the queue
         newNode = CreateNode(driver)
@@ -245,7 +219,6 @@ def Crawl(curNode, fsm, driver, globalVariables, depth):
         else:
             logger.info("going back click")
             backtrack(driver,fsm,curNode,globalVariables.formFieldValues, 1)
-    #print driver.page_source
     #submitButtons = getSubmitButtons(domString)
 
     #submitButtonNumber = getSubmitButtonNumber(domString, driver)
@@ -291,7 +264,6 @@ def Crawl(curNode, fsm, driver, globalVariables, depth):
 
 
 def checkForBannedUrls(attrs, globalVariables, currentPath):
-    #print str(clickable)
     clickable = attrs['href']
     if clickable.find("http") != -1:
         logger.info(str(clickable) + "is a absolute link")

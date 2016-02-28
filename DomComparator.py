@@ -30,12 +30,9 @@ def checkExistState(dom1,dom2):
         #print "ALL tag count %d %d" % (tagCount1, tagCount2)
         mintagCount = min(tagCount1,tagCount2)
         maxtagCount = max(tagCount1,tagCount2)
-        print mintagCount, maxtagCount
         if float(mintagCount)/float(maxtagCount) < 0.9:
-            print "huge difference in tag count"
+            logger.info("Different States Huge Difference in Tag Count")
             return False
-        #print strippedDom1
-        #print strippedDom2
         diff1 = htmldiff(strippedDom1, strippedDom2)
         diff2 = htmldiff(strippedDom2,strippedDom1)
         if len(diff1) > len(diff2):
@@ -46,7 +43,6 @@ def checkExistState(dom1,dom2):
         bdiff = BeautifulSoup(diff)
         ins = ''.join(str(bdiff.findAll("ins")))
         delete = ''.join(str(bdiff.findAll("del")))
-        #print ins
         print cleanDom(delete)
         diffDom = cleanDom(ins)
         print diffDom
@@ -54,23 +50,14 @@ def checkExistState(dom1,dom2):
         if diffDom!="[]":
             diffTagCount,diffStrippedDom = traverseDom(diffDom)
         else:
-            print "i am here"
             if hash(strippedDom1) ==  hash(strippedDom2):
                 return True
             else:
                 return False
-            #diffTagCount = 0
-            #diffStrippedDom = ""
-        #print diffStrippedDom
-        #print diffTagCount
-        print "tag count %d %d" % (diffTagCount, tagCount1)
-        print "first dom"
-        print dom1
-        print "second dom"
-        print dom2
+        logger.info("tag count %d %d" % (diffTagCount, tagCount1))
         if (float(diffTagCount)/float(tagCount1))*100 > 5:
             return False
-        logger.info("state already exist")
+        logger.info("STATE ALREADY EXIST")
         #print dom1
         #print dom2
         return True
@@ -84,12 +71,8 @@ def getDomDiff(parentDom, childDom):
 
 def traverseDom(domString):
     out = StringIO()
-    #print domString
     domString = str(tidy.parseString(domString))
-    #print domString
     domString = clean_html(domString)
-    #print domString
-    #print data
     tree   = etree.HTML(domString.replace('\r', ''))
     domString = '\n'.join([ etree.tostring(stree, pretty_print=True, method="xml")
                           for stree in tree ])
