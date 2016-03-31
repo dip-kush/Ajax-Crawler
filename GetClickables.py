@@ -25,7 +25,12 @@ class ClickableEntity:
         self.xpath = xpath
         self.action = "click"
 
-    #def __str__(self):
+
+    def __str__(self):
+        return str(self.xpath)
+
+    def __repr(self):
+        return str(self.xpath)
         #return self.tag+" "+self.attrs+" "+self.xpath
 
 
@@ -95,7 +100,8 @@ def otherClickables(domString):
     #onmouseoverElements = soup.findAll(attrs={'onmouseover': re.compile(r".")})
     elements = onclickElements
     for element in elements:
-        if element.name != "a" or element.name != "input" or element.name != "input":
+        if element.name != "a" or element.name != "input" or element.name != "button":
+            print element
             otherClickables.append(element)
     del elements
     return otherClickables

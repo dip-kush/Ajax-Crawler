@@ -21,24 +21,54 @@ def cleanDom(dom):
 def hash(dom):
     return(hashlib.sha256(dom.encode('utf-8')).hexdigest())
 
+def getHtmlDiff(dom1, dom2, tagCount1, tagCount2):
+    diff1 = htmldiff(dom1, dom2)
+    #diff2 = htmldiff(dom2 ,dom1)
+    #print diff1
+    '''
+    if len(diff1) > len(diff2):
+        diff = diff1
+        tagCount = tagCount1
+    else:
+        diff = diff2
+        tagCount = tagCount2
+    '''
+    diff = diff1
+    tagCount = tagCount1
+    #diff = diff1
+    bdiff = BeautifulSoup(diff)
+    ins = ''.join(str(bdiff.findAll("ins")))
+    print ins
+    delete = ''.join(str(bdiff.findAll("del")))
+    print cleanDom(delete)
+    diffDom = cleanDom(ins)
+    print diffDom
+    return diffDom
+
+
 def checkExistState(dom1,dom2):
     if hash(dom1) == hash(dom2):
         return True
     else:
+        tagCount = 0
         tagCount1, strippedDom1 = traverseDom(dom1)
         tagCount2, strippedDom2 = traverseDom(dom2)
-        #print "ALL tag count %d %d" % (tagCount1, tagCount2)
+        print "ALL tag count %d %d" % (tagCount1, tagCount2)
         mintagCount = min(tagCount1,tagCount2)
         maxtagCount = max(tagCount1,tagCount2)
         if float(mintagCount)/float(maxtagCount) < 0.9:
             logger.info("Different States Huge Difference in Tag Count")
             return False
+
+        '''
         diff1 = htmldiff(strippedDom1, strippedDom2)
         diff2 = htmldiff(strippedDom2,strippedDom1)
         if len(diff1) > len(diff2):
             diff = diff1
+            tagCount = tagCount1
         else:
             diff = diff2
+            tagCount = tagCount2
 
         bdiff = BeautifulSoup(diff)
         ins = ''.join(str(bdiff.findAll("ins")))
@@ -46,16 +76,29 @@ def checkExistState(dom1,dom2):
         print cleanDom(delete)
         diffDom = cleanDom(ins)
         print diffDom
-
+        '''
+        tagCount = tagCount1
+        diffDom = getHtmlDiff(strippedDom1, strippedDom2, tagCount1, tagCount2)
         if diffDom!="[]":
             diffTagCount,diffStrippedDom = traverseDom(diffDom)
         else:
             if hash(strippedDom1) ==  hash(strippedDom2):
                 return True
             else:
+
+                #diffDom = getHtmlDiff(dom1, dom2, tagCount1, tagCount2)
+                #if diffDom!= "[]":
+                #    diffTagCount,difference = traverseDom(diffDom)
+                #else:
+
+                logger.info("Different States No Insert Delete Tags Found")
                 return False
+
+
         logger.info("tag count %d %d" % (diffTagCount, tagCount1))
-        if (float(diffTagCount)/float(tagCount1))*100 > 5:
+        if (float(diffTagCount)/float(tagCount))*100 > 5:
+            print diffTagCount, tagCount
+            print float(diffTagCount)/float(tagCount)
             return False
         logger.info("STATE ALREADY EXIST")
         #print dom1

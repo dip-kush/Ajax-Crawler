@@ -28,6 +28,8 @@ class StateMachine:
     def __init__(self):
         self.graph = nx.MultiDiGraph()
         self.doBacktrack = False
+        self.start_header = ""
+        self.login_header = ""
 
     def addNode(self, number, data):
         '''
@@ -36,10 +38,10 @@ class StateMachine:
          '''
         self.graph.add_node(number, nodedata=data)
 
-    def addEdges(self, n1, n2, et):
+    def addEdges(self, n1, n2, et, header):
         ''' Adding a edge from node n1 to n2 '''
 
-        self.graph.add_edge(n1, n2, event=et)
+        self.graph.add_edge(n1, n2, event=et, header=header)
 
     def checkNodeExists(self, dom):
         '''
@@ -70,6 +72,29 @@ class StateMachine:
             if compare_url(url, self.graph.node[n]['nodedata'].link):
                 return True
         return False
+
+    def addHeaders(self, start_header, login_header):
+        self.start_header = start_header
+        self.login_header = login_header    
+    
+    def pathSourcetoSink(self):
+        graph = self.graph
+        sink_nodes = [node for node, outdegree in graph.out_degree
+                        (graph.nodes()).items() if outdegree == 0]
+        source_nodes = [node for node, indegree in graph.in_degree
+                        (graph.nodes()).items() if indegree == 0]
+        if source_nodes == []:
+            source_nodes.append(0)
+        logger.info("Printing All paths from source to sink") 
+        for sink in sink_nodes:
+            for source in source_nodes:
+                for path in nx.all_simple_paths(graph, source=source, target=sink):
+                    #print path
+                    for i in range(len(path)-1):
+                        pass
+                        #print path[i]
+                        #print graph.edge[path[i]][path[i+1]][0]["event"].xpath
+                        #print "path", self.graph.node[item]['nodedata'].backtrackPath
 
 '''
 

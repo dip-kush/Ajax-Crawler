@@ -10,19 +10,20 @@ from selenium.webdriver.common.alert import Alert
 from State import StateMachine, NodeData
 from DomComparator import getDomDiff
 from FormExtractor import getSubmitButtonNumber, fillFormValues
-from logger import LoggerHandler
+from logger import LoggerHandler, printRequest,clearContent
 
 
 logger = LoggerHandler(__name__)
 
 
 
-def initState(domString, link, title, driver, globalVariables,depth):
+def initState(domString, link, title, driver, globalVariables,depth,start_url,login_header):
     '''
     Initialize the State Machine adding a StateNode to fsm
     '''
 
     fsm = StateMachine()
+    fsm.addHeaders(start_url, login_header)
     node = NodeData()
     node.link = link
     node.domString = domString
@@ -32,7 +33,7 @@ def initState(domString, link, title, driver, globalVariables,depth):
     node.clickables = GetClickables(domString)
     for item in node.clickables:
         print item.xpath
-    node.backtrackPath.append(link)
+    node.backtrackPath.append(link) 
     fsm.addNode(0, node)
     driver.save_screenshot("snaps/" + str(0) + ".png")
     if frameExists(node.domString):
@@ -42,6 +43,8 @@ def initState(domString, link, title, driver, globalVariables,depth):
         Crawl(0, fsm, driver, globalVariables, depth+1)
     #clickables = graph.node[curNode]['nodedata'].clickables
     logger.info("THE END")
+    fsm.pathSourcetoSink()
+    #print fsm.graph.edge
     drawGraph(fsm)
 
 
@@ -52,7 +55,9 @@ def drawGraph(fsm):
     printNodes(graph)
     returnJsonGraph(graph)
     print fsm.doBacktrack
+    print "------------------------------------------------------"
     logger.info("Number of Node Found %s" % (fsm.numberOfNodes()))
+    print "------------------------------------------------------"
     pos = nx.spring_layout(graph)
     labels = {k: str(k) for k in graph.nodes()}
     #labels = {k: graph.node[k]['nodedata'].title for k in graph.nodes()}
@@ -61,7 +66,7 @@ def drawGraph(fsm):
     nx.draw_networkx_labels(graph, pos, labels)
     #nx.draw_networkx_labels( graph ,pos, labels)
     #nx.draw(graph,node_size=3000,nodelist=graph.nodes(),node_color='b')
-    plt.show()
+    #plt.show()
 
 
 
@@ -104,6 +109,7 @@ def backtrack(driver, fsm, node, formValues, tillEnd):
             driver.switch_to.frame(driver.find_element_by_name("body"))
         time.sleep(1.0)
         '''
+    clearContent()	
 
 def AcceptAlert(driver):
     try:
@@ -210,7 +216,8 @@ def Crawl(curNode, fsm, driver, globalVariables, depth):
         AcceptAlert(driver)
 
         time.sleep(1)
-        # make a new node add in the graph and the queue
+         
+       # make a new node add in the graph and the queue
         newNode = CreateNode(driver)
         # add the Node checking if the node already exists
         nodeNumber = addGraphNode(newNode,curNode,driver,fsm,entity)
@@ -304,18 +311,26 @@ def checkForBannedUrls(attrs, globalVariables, currentPath):
 
 
 def printNodes(graph):
+    print "----------------------Nodes---------------------"
     numberofnodes = graph.number_of_nodes()
     for i in range(numberofnodes):
-        print i ,graph.node[i]['nodedata'].backtrackPath
+        print i ,printBackTrackPath(graph.node[i]['nodedata'].backtrackPath)
+    print "------------------------------------------------"
+    
+def printBackTrackPath(path):
+    for entity in path:
+        print entity,
 
 
-def printEdges(graph):
+def printEdges(graph):  
+    print "----------------------Edges----------------------"
     edges = graph.edges()
     numEdges = len(edges)
     for i in range(numEdges):
         source = edges[i][0]
         dest = edges[i][1]
-        print edges[i], graph[source][dest]
+        print edges[i], graph.edge[source][dest][0]["event"].xpath,graph.edge[source][dest][0]["header"] 
+    print "-------------------------------------------------"
 
 def returnJsonGraph(graph):
     graphData = {}
@@ -338,7 +353,7 @@ def returnJsonGraph(graph):
         "value": 50
         }
         graphData["links"].append(newLinkDict)
-    print json.dumps(graphData)
+    #print json.dumps(graphData)
 
 def CreateNode(driver):
     '''
@@ -373,15 +388,18 @@ def addGraphNode(newNode, curNode, driver, fsm, entity):
     existNodeNumber = fsm.checkNodeExists(newNode.domString)
 
     if existNodeNumber == -1:
+        header = printRequest()
+        print "========================="
+        print header
+        print "========================="
         nodeNumber = fsm.numberOfNodes()
         newNode.insertedDom = getDomDiff(graph.node[curNode]['nodedata'].domString,newNode.domString)
-
         newNode.clickables = GetClickables(newNode.insertedDom)
         #print newNode.insertedDom
         #write code here
         fsm.addNode(nodeNumber, newNode)
         logger.info("Adding a New Node %d to Graph" % (nodeNumber))
-        fsm.addEdges(curNode, nodeNumber, entity)
+        fsm.addEdges(curNode, nodeNumber, entity, header)
         logger.info(
             "Adding a Edge from Node %d and %d" %
             (curNode, nodeNumber))

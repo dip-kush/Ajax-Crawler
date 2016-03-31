@@ -2,10 +2,11 @@ import argparse
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from Crawler import initState
-from logger import LoggerHandler
+from logger import LoggerHandler, printRequest,clearContent
 from FormExtractor import getFormFieldValue
 from BeautifulSoup import BeautifulSoup
-
+from selenium.webdriver.common.proxy import *
+import time
 logger = LoggerHandler(__name__)
 
 
@@ -46,6 +47,12 @@ class Globals:
 
 def doLogin(login_url, driver, scriptFilePath=None, scriptFileHandler=None):
     driver.get(login_url)
+    start_header = printRequest()
+    print "========================="
+    print start_header
+    print "========================="
+    time.sleep(2)
+    clearContent()
     if scriptFilePath:
         f = open("login_script.html")
     else:
@@ -73,16 +80,26 @@ def doLogin(login_url, driver, scriptFilePath=None, scriptFileHandler=None):
                 driver.find_element_by_name(fieldVal).send_keys(value)
             else:
                 driver.find_element_by_xpath(fieldVal).send_keys(value)
+    time.sleep(2)    
+    login_header = printRequest()
+    print "========================="
+    print login_header
+    print "========================="
+    
+    clearContent()
+    return (start_header, login_header)    
 
 def initializeParams(crawling_spec):
     login_url = None
+    start_header = ""
+    login_header = ""
     globalVariables = Globals()
 
     # globalVariables.bannedUrls.append("http://127.0.0.1:81/login/profile.html")
 
     #driver = webdriver.PhantomJS()
 
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
     logger.info("Browser is Launched")
     #driver.get("http://127.0.0.1:81/login/login.php")
     if crawling_spec["login_url"]:
@@ -93,7 +110,8 @@ def initializeParams(crawling_spec):
         if not login_url:
             logger.error("No Login URL provided")
         else:
-            doLogin(login_url, driver, scriptFileHandler = crawling_spec["login_script"])
+            start_url, login_url =  \
+                   doLogin(login_url, driver, scriptFileHandler = crawling_spec["login_script"])
 
     if crawling_spec["form_values_script"]:
         globalVariables.getFormValues(fileHandler = crawling_spec["form_values_script"])
@@ -129,7 +147,7 @@ def initializeParams(crawling_spec):
         driver.current_url,
         driver.title,
         driver,
-        globalVariables,0)
+        globalVariables,0,start_header, login_header)
 
     #assert "Welcome, " in driver.page_source
     driver.close()
@@ -143,6 +161,8 @@ def main():
     password = vinaykool
     '''
     login_url = None
+    start_header = ""
+    login_header = ""
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-l", "--login-script", action="store", dest="login_script", help="Path to python login script")
@@ -163,7 +183,22 @@ def main():
 
     #driver = webdriver.PhantomJS()
 
-    driver = webdriver.Chrome()
+    
+    myProxy = "localhost:8081"
+
+    proxy = Proxy({
+        'proxyType': ProxyType.MANUAL,
+        'httpProxy': myProxy,
+        'ftpProxy': myProxy,
+        'sslProxy': myProxy,
+        'noProxy': '' # set this value as desired
+    })
+
+    
+    driver = webdriver.Firefox(proxy=proxy)
+    
+
+    #driver = webdriver.Chrome()
     logger.info("Browser is Launched")
     #driver.get("http://127.0.0.1:81/login/login.php")
     if args.login_url:
@@ -174,7 +209,8 @@ def main():
         if not login_url:
             logger.error("No Login URL provided")
         else:
-            doLogin(login_url, driver, scriptFilePath = args.login_script)
+            start_header, login_header =  \
+                    doLogin(login_url, driver, scriptFilePath = args.login_script)
 
     if args.form_values_script:
         globalVariables.getFormValues(args.form_values_script)
@@ -209,7 +245,7 @@ def main():
         driver.current_url,
         driver.title,
         driver,
-        globalVariables,0)
+        globalVariables,0,start_header,login_header)
 
     #assert "Welcome, " in driver.page_source
     driver.close()
